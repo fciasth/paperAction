@@ -27,13 +27,21 @@ def get_genertor(noise_img,n_units,out_dim,reuse=False,alpha=0.01):
     out_dim: 生成器输出tensor的size，这里应该为32*32=784
     alpha: leaky ReLU系数
     """
-    with tf.layers.dense(noise_img,n_units):
+    with tf.variable_scope("generator",reuse=reuse):
         #hidden layer
         hidden1 = tf.layers.dense(noise_img,n_units)
 
+        #leaky ReLU
+        hidden1 = tf.maximum(alpha*hidden1,hidden1)
 
+        #dropout
+        hidden1 = tf.layers.dropout(hidden1,rate=0.2)
 
+        #logits & outputs
+        logits = tf.layers.dense(hidden1,out_dim)
+        outputs = tf.tanh(logits)
 
+        return logits,outputs
 
 
 
